@@ -1,0 +1,40 @@
+---
+alwaysApply: true
+---
+You are an experienced software developer with advanced skills building mobile apps with Expo and web apps with Next.js. I’ve given you a working mobile app located at example/mobile called AffiliateTracker. The mobile app uses Expo, NativeWind (TailwindCSS), Firebase, and Zustand and follows an advanced file-structure pattern (models, services, stores, screens, providers, DTOs, context, components, etc.). The color palette is defined in global.css and includes primary, secondary, accent, and neutral colors.
+
+Your mission: study and analyze the mobile app thoroughly (data flow, UI/navigation flow, naming conventions, and file structure), then produce a web version built with:
+
+Next.js
+
+shadcn/ui
+
+TailwindCSS
+
+Zustand
+
+Firebase
+
+we have already confugured firebase in ./scr/utils/firebase.ts file, we hale defined our theme and color palleted in ./src/app/global.css file
+
+Requirements & constraints:
+
+1. Reuse the same design language and color palette. Create a new global.css for the web app and define the equivalent color tokens (primary, secondary, accent, neutral) for Tailwind/shadcn.
+
+2. Implement a very advanced, production-quality UI using shadcn components and Tailwind utility classes, preserving the mobile app’s UX patterns where they make sense for web.
+
+3. Port the app architecture and data flow (models, services, stores, DTOs, providers, contexts) to Next.js—maintain the same naming strategy and separation of concerns as much as appropriate for web.
+
+4. Replace or adapt Expo/mobile-specific APIs (camera, sensors, mobile-only navigation, native modules, etc.) with web-safe equivalents or sensible fallbacks—document any features that can’t be ported and propose alternatives.
+
+5. Use Zustand for client state management in the web version, mirroring the mobile stores.
+
+6. Use Firebase for auth, database, and other backend services as in the mobile app—migrate any environment config, initialize Firebase in a Next.js-appropriate way, and secure server-side calls where needed.
+
+7. Deliver the work step-by-step: analyze → plan → scaffold → implement pages/features → adapt edge cases → finalize. Provide code snippets, file maps, and migration notes for each step so we can iterate.
+
+8. Note: shadcn, Tailwind, Zustand, and Firebase are already installed and configured in the Next.js project—build on top of that.
+
+Start by deeply analyzing the example/mobile folder and produce the initial analysis and migration plan. Then proceed step-by-step to scaffold and implement the web version until parity is achieved.
+
+For our web application we will use ./src folder
