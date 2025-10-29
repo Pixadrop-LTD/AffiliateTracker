@@ -3,12 +3,27 @@
  * Mirrors the mobile app's entries store structure
  */
 
+import type { CreateEntryDto, UpdateEntryDto } from "@/domain/dto";
 import type { EntryWithDerived } from "@/domain/models/entry";
 import { calculateEntryDerived } from "@/domain/models/entry";
 import { EntriesService } from "@/services";
 import type { DocumentSnapshot } from "firebase/firestore";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
+
+type DashboardData = {
+    totalSpend: number;
+    totalEarnings: number;
+    totalProfit: number;
+    avgROI: number;
+    entriesCount: number;
+    dailyData: {
+        date: string;
+        spend: number;
+        earnings: number;
+        profit: number;
+    }[];
+} | null;
 
 interface EntriesState {
     // State
@@ -21,19 +36,7 @@ interface EntriesState {
     lastDoc: DocumentSnapshot | null;
 
     // Dashboard data
-    dashboardData: {
-        totalSpend: number;
-        totalEarnings: number;
-        totalProfit: number;
-        avgROI: number;
-        entriesCount: number;
-        dailyData: {
-            date: string;
-            spend: number;
-            earnings: number;
-            profit: number;
-        }[];
-    } | null;
+    dashboardData: DashboardData;
 
     // Actions
     setEntries: (entries: EntryWithDerived[]) => void;
@@ -42,16 +45,16 @@ interface EntriesState {
     setError: (error: string | null) => void;
     setHasMore: (hasMore: boolean) => void;
     setTotalCount: (count: number) => void;
-    setDashboardData: (data: any) => void;
+    setDashboardData: (data: DashboardData) => void;
 
     // Async actions
     fetchEntries: (options?: { limitCount?: number; startDate?: Date; endDate?: Date; status?: string; uid?: string }) => Promise<void>;
     loadMoreEntries: () => Promise<void>;
-    createEntry: (input: any) => Promise<string>;
-    updateEntry: (id: string, updates: any) => Promise<void>;
+    createEntry: (input: CreateEntryDto) => Promise<string>;
+    updateEntry: (id: string, updates: UpdateEntryDto) => Promise<void>;
     deleteEntry: (id: string) => Promise<void>;
     fetchEntryById: (id: string) => Promise<void>;
-    fetchDashboardData: (startDate: Date, endDate: Date) => Promise<void>;
+    fetchDashboardData: (startDate: Date, endDate: Date, uid?: string) => Promise<void>;
 
     // Utility actions
     clearError: () => void;
@@ -99,7 +102,13 @@ export const useEntriesStore = create<EntriesState>()(
 
                     console.log("fetchEntries called with options:", options);
 
-                    const result = await EntriesService.getUserEntries(options.limitCount || 50, undefined, options.uid);
+                    const result = await EntriesService.getUserEntries(
+                        options.limitCount || 50,
+                        undefined,
+                        options.uid,
+                        options.startDate,
+                        options.endDate
+                    );
 
                     console.log("Entries fetched successfully:", result.entries.length, "entries");
 
@@ -138,7 +147,7 @@ export const useEntriesStore = create<EntriesState>()(
                 }
             },
 
-            createEntry: async (input: any) => {
+            createEntry: async (input: CreateEntryDto) => {
                 const { setLoading, setError } = get();
 
                 try {
@@ -160,7 +169,7 @@ export const useEntriesStore = create<EntriesState>()(
                 }
             },
 
-            updateEntry: async (id: string, updates: any) => {
+            updateEntry: async (id: string, updates: UpdateEntryDto) => {
                 const { setLoading, setError, entries, setEntries, setSelectedEntry, selectedEntry } = get();
 
                 try {
@@ -172,15 +181,15 @@ export const useEntriesStore = create<EntriesState>()(
                     // Update local state with recalculated derived fields
                     const updatedEntries = entries.map((entry) => {
                         if (entry.id !== id) return entry;
-                        const merged: any = { ...entry, ...updates };
+                        const merged = { ...entry, ...updates } as EntryWithDerived;
                         return calculateEntryDerived(merged);
                     });
                     setEntries(updatedEntries);
 
                     // Keep selectedEntry in sync if it's the one being edited
                     if (selectedEntry && selectedEntry.id === id) {
-                        const mergedSelected: any = { ...selectedEntry, ...updates };
-                        setSelectedEntry(calculateEntryDerived(mergedSelected) as EntryWithDerived);
+                        const mergedSelected = { ...selectedEntry, ...updates } as EntryWithDerived;
+                        setSelectedEntry(calculateEntryDerived(mergedSelected));
                     }
                 } catch (error) {
                     const errorMessage = error instanceof Error ? error.message : "Failed to update entry";
@@ -228,14 +237,14 @@ export const useEntriesStore = create<EntriesState>()(
                 }
             },
 
-            fetchDashboardData: async (startDate: Date, endDate: Date) => {
+            fetchDashboardData: async (startDate: Date, endDate: Date, uid?: string) => {
                 const { setLoading, setError, setDashboardData } = get();
 
                 try {
                     setLoading(true);
                     setError(null);
 
-                    const data = await EntriesService.getDashboardData(startDate, endDate);
+                    const data = await EntriesService.getDashboardData(startDate, endDate, uid);
                     setDashboardData(data);
                 } catch (error) {
                     setError(error instanceof Error ? error.message : "Failed to fetch dashboard data");

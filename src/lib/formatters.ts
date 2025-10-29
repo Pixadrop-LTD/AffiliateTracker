@@ -33,7 +33,7 @@ export const formatNumber = (value: number, locale: string = "en-US"): string =>
  * @returns Formatted date string
  */
 export const formatDate = (date: Date, format: "short" | "long" | "medium" = "short"): string => {
-    const formatOptions: Intl.DateTimeFormatOptions = {
+    const formatOptions: Record<"short" | "medium" | "long", Intl.DateTimeFormatOptions> = {
         short: { month: "short", day: "numeric", year: "numeric" },
         medium: { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" },
         long: { weekday: "long", year: "numeric", month: "long", day: "numeric" },

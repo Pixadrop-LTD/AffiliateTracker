@@ -280,7 +280,7 @@ export const ReportsPageClient = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-background to-primary-50/30 p-4 pb-28">
+        <div className="min-h-screen bg-linear-to-br from-neutral-50 via-background to-primary-50/30 p-4 pb-28">
             <div className="mx-auto max-w-7xl space-y-6">
                 {/* Header */}
                 <motion.div
@@ -290,7 +290,7 @@ export const ReportsPageClient = () => {
                     className="flex items-center justify-between"
                 >
                     <div>
-                        <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-primary-600 via-primary-700 to-accent-600 bg-clip-text text-transparent">
+                        <h1 className="text-4xl font-extrabold tracking-tight bg-linear-to-r from-primary-600 via-primary-700 to-accent-600 bg-clip-text text-transparent">
                             Reports
                         </h1>
                         <p className="mt-2 text-muted-foreground">Performance insights at a glance.</p>
@@ -371,7 +371,7 @@ export const ReportsPageClient = () => {
                         transition={{ duration: 0.5, delay: 0.2 }}
                         whileHover={{ scale: 1.05, y: -5 }}
                     >
-                        <Card className="border-3 border-primary-200 bg-gradient-to-br from-primary-50 to-white shadow-xl hover:shadow-2xl transition-all">
+                        <Card className="border-3 border-primary-200 bg-linear-to-br from-primary-50 to-white shadow-xl hover:shadow-2xl transition-all">
                             <CardHeader className="pb-2">
                                 <CardDescription className="text-xs font-semibold uppercase tracking-wide text-primary-700">Entries</CardDescription>
                                 <CardTitle className="text-3xl font-extrabold text-primary-600">{totals.count}</CardTitle>
@@ -384,7 +384,7 @@ export const ReportsPageClient = () => {
                         transition={{ duration: 0.5, delay: 0.3 }}
                         whileHover={{ scale: 1.05, y: -5 }}
                     >
-                        <Card className="border-3 border-red-200 bg-gradient-to-br from-red-50 to-white shadow-xl hover:shadow-2xl transition-all">
+                        <Card className="border-3 border-red-200 bg-linear-to-br from-red-50 to-white shadow-xl hover:shadow-2xl transition-all">
                             <CardHeader className="pb-2">
                                 <CardDescription className="text-xs font-semibold uppercase tracking-wide text-red-700">Total Spend</CardDescription>
                                 <CardTitle className="text-3xl font-extrabold text-destructive">
@@ -399,7 +399,7 @@ export const ReportsPageClient = () => {
                         transition={{ duration: 0.5, delay: 0.4 }}
                         whileHover={{ scale: 1.05, y: -5 }}
                     >
-                        <Card className="border-3 border-emerald-200 bg-gradient-to-br from-emerald-50 to-white shadow-xl hover:shadow-2xl transition-all">
+                        <Card className="border-3 border-emerald-200 bg-linear-to-br from-emerald-50 to-white shadow-xl hover:shadow-2xl transition-all">
                             <CardHeader className="pb-2">
                                 <CardDescription className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
                                     Total Earnings
@@ -419,8 +419,8 @@ export const ReportsPageClient = () => {
                         <Card
                             className={`border-3 shadow-xl hover:shadow-2xl transition-all ${
                                 totalProfit >= 0
-                                    ? "border-emerald-200 bg-gradient-to-br from-emerald-50 to-white"
-                                    : "border-red-200 bg-gradient-to-br from-red-50 to-white"
+                                    ? "border-emerald-200 bg-linear-to-br from-emerald-50 to-white"
+                                    : "border-red-200 bg-linear-to-br from-red-50 to-white"
                             }`}
                         >
                             <CardHeader className="pb-2">
@@ -451,18 +451,18 @@ export const ReportsPageClient = () => {
 
                 {/* Main Chart */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.6 }}>
-                    <Card className="border-3 border-primary-200 bg-gradient-to-br from-white to-primary-50/30 shadow-2xl">
+                    <Card className="border-3 border-primary-200 bg-linear-to-br from-white to-primary-50/30 shadow-2xl">
                         <CardHeader>
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <CardTitle className="text-2xl font-extrabold bg-gradient-to-r from-primary-600 via-primary-700 to-accent-600 bg-clip-text text-transparent">
+                                    <CardTitle className="text-2xl font-extrabold bg-linear-to-r from-primary-600 via-primary-700 to-accent-600 bg-clip-text text-transparent">
                                         {groupBy === "day" && "Daily"}
                                         {groupBy === "week" && "Weekly"}
                                         {groupBy === "month" && "Monthly"} Performance
                                     </CardTitle>
                                     <CardDescription className="text-sm font-medium">Financial metrics over time</CardDescription>
                                 </div>
-                                <div className="flex gap-2 rounded-xl bg-gradient-to-r from-primary-100 to-accent-100 p-1 shadow-inner">
+                                <div className="flex gap-2 rounded-xl bg-linear-to-r from-primary-100 to-accent-100 p-1 shadow-inner">
                                     {chartTypes.map((t) => (
                                         <Button
                                             key={t}

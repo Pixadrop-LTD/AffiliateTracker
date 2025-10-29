@@ -175,7 +175,7 @@ export interface UserPrefsDoc {
   /** Dashboard widget preferences */
   dashboard?: {
     /** Preferred chart type for main chart */
-    chartType?: 'line' | 'bar' | 'area';
+    chartType?: 'line' | 'bar' | 'area' | 'pie';
 
     /** KPI cards to show */
     kpiCards?: ('spend' | 'earnings' | 'profit' | 'roi')[];
@@ -185,7 +185,7 @@ export interface UserPrefsDoc {
   };
 
   /** NEW: Flattened dashboard fields */
-  chartType?: 'line' | 'bar' | 'area';
+  chartType?: 'line' | 'bar' | 'area' | 'pie';
   visibleKpiCards?: ('spend' | 'earnings' | 'profit' | 'roi')[];
 
   /** Timestamp when preferences were created */
@@ -271,7 +271,7 @@ export interface UpdateUserPrefsInput {
 
   /** Dashboard preferences */
   dashboard?: {
-    chartType?: 'line' | 'bar' | 'area';
+    chartType?: 'line' | 'bar' | 'area' | 'pie';
     kpiCards?: ('spend' | 'earnings' | 'profit' | 'roi')[];
     defaultPeriod?: '7d' | '30d' | 'MTD';
   };

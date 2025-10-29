@@ -56,9 +56,12 @@ export class UserService {
         const db = await this.getDb();
         const userRef = doc(db, this.USERS_COLLECTION, uid);
         const userData: Omit<UserDoc, 'uid'> = {
-            ...data,
-            uid,
+            email: data.email,
+            displayName: data.displayName,
+            photoURL: data.photoURL,
             role: data.role || 'user',
+            defaultCurrency: data.defaultCurrency,
+            timezone: data.timezone,
             createdAt: Timestamp.now(),
             updatedAt: Timestamp.now(),
         };

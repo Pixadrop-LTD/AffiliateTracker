@@ -39,15 +39,17 @@ export class EntriesService {
 
     /**
      * Get current authenticated user ID
+     * @throws Error if no user is authenticated
      */
     private static getCurrentUid(): string {
+        // Only try to get auth in browser environment
+        if (typeof window === 'undefined') {
+            throw new Error('Cannot access auth on server side');
+        }
+
         const auth = getAuthInstance();
         const uid = auth.currentUser?.uid;
         if (!uid) {
-            console.error('Auth state:', {
-                currentUser: auth.currentUser,
-                hasAuthInstance: !!auth,
-            });
             throw new Error('User not authenticated. Please sign in to continue.');
         }
         return uid;
@@ -64,7 +66,7 @@ export class EntriesService {
 
             const entryData: Omit<EntryDoc, 'id'> = {
                 uid,
-                date: input.date instanceof Date ? Timestamp.fromDate(input.date) : (input.date as any),
+                date: input.date instanceof Date ? Timestamp.fromDate(input.date) : (input.date),
                 spend: input.spend || 0,
                 revenue: input.revenue,
                 profit: input.revenue && input.spend ? input.revenue - input.spend : undefined,
@@ -117,7 +119,7 @@ export class EntriesService {
             };
 
             if (input.date !== undefined) {
-                updateData.date = input.date instanceof Date ? Timestamp.fromDate(input.date) : (input.date as any);
+                updateData.date = input.date instanceof Date ? Timestamp.fromDate(input.date) : input.date as Timestamp;
             }
             if (input.spend !== undefined) updateData.spend = input.spend;
             if (input.revenue !== undefined) {
@@ -157,7 +159,9 @@ export class EntriesService {
     static async getUserEntries(
         limitCount: number = 50,
         startAfterDoc?: DocumentSnapshot,
-        uid?: string
+        uid?: string,
+        startDate?: Date,
+        endDate?: Date
     ): Promise<{ entries: EntryWithDerived[]; lastDoc?: DocumentSnapshot; hasMore: boolean }> {
         try {
             const db = await this.getDb();
@@ -166,14 +170,27 @@ export class EntriesService {
 
             let q = query(
                 collection(db, this.ENTRIES_COLLECTION),
-                where('uid', '==', userId),
-                orderBy('date', 'desc'),
-                limit(limitCount)
+                where('uid', '==', userId)
             );
 
+            // Add date range filters if provided
+            if (startDate) {
+                const start = new Date(startDate);
+                start.setHours(0, 0, 0, 0);
+                q = query(q, where('date', '>=', Timestamp.fromDate(start)));
+            }
+            if (endDate) {
+                const end = new Date(endDate);
+                end.setHours(23, 59, 59, 999);
+                q = query(q, where('date', '<=', Timestamp.fromDate(end)));
+            }
+
+            // Add ordering and pagination
+            q = query(q, orderBy('date', 'desc'));
             if (startAfterDoc) {
                 q = query(q, startAfter(startAfterDoc));
             }
+            q = query(q, limit(limitCount));
 
             const querySnapshot = await getDocs(q);
             const entries: EntryWithDerived[] = [];
@@ -199,14 +216,14 @@ export class EntriesService {
     /**
      * Get entries by date range
      */
-    static async getEntriesByDateRange(startDate: Date, endDate: Date): Promise<EntryWithDerived[]> {
+    static async getEntriesByDateRange(startDate: Date, endDate: Date, uid?: string): Promise<EntryWithDerived[]> {
         try {
             const db = await this.getDb();
-            const uid = this.getCurrentUid();
+            const userId = uid || this.getCurrentUid();
 
             const q = query(
                 collection(db, this.ENTRIES_COLLECTION),
-                where('uid', '==', uid),
+                where('uid', '==', userId),
                 where('date', '>=', Timestamp.fromDate(startDate)),
                 where('date', '<=', Timestamp.fromDate(endDate)),
                 orderBy('date', 'desc')
@@ -232,7 +249,7 @@ export class EntriesService {
     /**
      * Get dashboard data aggregated for a date range
      */
-    static async getDashboardData(startDate: Date, endDate: Date): Promise<{
+    static async getDashboardData(startDate: Date, endDate: Date, uid?: string): Promise<{
         totalSpend: number;
         totalEarnings: number;
         totalProfit: number;
@@ -247,7 +264,7 @@ export class EntriesService {
     }> {
         try {
             const db = await this.getDb();
-            const uid = this.getCurrentUid();
+            const userId = uid || this.getCurrentUid();
 
             // Normalize dates to start and end of day
             const start = new Date(startDate);
@@ -257,7 +274,7 @@ export class EntriesService {
 
             const q = query(
                 collection(db, this.ENTRIES_COLLECTION),
-                where('uid', '==', uid),
+                where('uid', '==', userId),
                 where('date', '>=', Timestamp.fromDate(start)),
                 where('date', '<=', Timestamp.fromDate(end)),
                 orderBy('date', 'desc')

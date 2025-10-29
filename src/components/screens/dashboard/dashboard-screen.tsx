@@ -24,7 +24,7 @@ import TimeRangeSelector, { getDatesForRange } from "./time-range-selector";
  */
 export const DashboardScreen = () => {
     const { user, signOut } = useAuth();
-    const { dashboardData, loading, fetchDashboardData, fetchEntries } = useEntriesStore();
+    const { entries, dashboardData, loading, fetchDashboardData, fetchEntries } = useEntriesStore();
 
     // State management
     const [timeRange, setTimeRange] = useState<TimeRange>("7d");
@@ -58,8 +58,8 @@ export const DashboardScreen = () => {
         const fetchData = async () => {
             try {
                 await Promise.all([
-                    fetchDashboardData(start, end),
-                    fetchEntries({ limitCount: 5, startDate: start, endDate: end }),
+                    fetchDashboardData(start, end, user.uid),
+                    fetchEntries({ limitCount: 5, startDate: start, endDate: end, uid: user.uid }),
                 ]);
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
@@ -76,8 +76,8 @@ export const DashboardScreen = () => {
         setRefreshing(true);
         try {
             await Promise.all([
-                fetchDashboardData(start, end),
-                fetchEntries({ limitCount: 5, startDate: start, endDate: end }),
+                fetchDashboardData(start, end, user.uid),
+                fetchEntries({ limitCount: 5, startDate: start, endDate: end, uid: user.uid }),
             ]);
         } catch (error) {
             console.error("Error refreshing dashboard:", error);
@@ -101,12 +101,7 @@ export const DashboardScreen = () => {
             {/* Time Range Selector */}
             <div className="border-b border-border/40 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
                 <div className="container mx-auto px-4 pb-6">
-                    <TimeRangeSelector
-                        value={timeRange}
-                        onChange={setTimeRange}
-                        customDate={customDate}
-                        onCustomDateChange={setCustomDate}
-                    />
+                    <TimeRangeSelector value={timeRange} onChange={setTimeRange} customDate={customDate} onCustomDateChange={setCustomDate} />
                 </div>
             </div>
 
@@ -123,7 +118,7 @@ export const DashboardScreen = () => {
                         onChartTypeChange={setChartType}
                     />
 
-                    <RecentEntriesList loading={loading} limit={5} showViewAll />
+                    <RecentEntriesList entries={entries} loading={loading} limit={5} showViewAll />
                 </div>
             </div>
         </div>
@@ -167,7 +162,7 @@ const HeaderSection = ({
     >
         {/* Decorative gradient overlay */}
         <div className="absolute inset-0 bg-linear-to-r from-primary-500/5 via-transparent to-accent-500/5" />
-        
+
         {/* Animated sparkle effect */}
         <div className="absolute right-20 top-4 opacity-20">
             <Sparkles className="size-8 text-primary-500 animate-pulse" />
@@ -175,11 +170,7 @@ const HeaderSection = ({
 
         <div className="relative container mx-auto px-4 py-8">
             <div className="flex items-center justify-between">
-                <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                >
+                <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>
                     <div className="flex items-center gap-3">
                         <h1 className="text-4xl font-bold tracking-tight bg-linear-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
                             Dashboard
@@ -208,12 +199,7 @@ const HeaderSection = ({
                     >
                         <RefreshCw className={refreshing ? "size-5 animate-spin text-primary-600" : "size-5 text-neutral-600"} />
                     </Button>
-                    <motion.button
-                        onClick={onSignOut}
-                        className="group"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                    >
+                    <motion.button onClick={onSignOut} className="group" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                         <div className="rounded-full border-2 border-primary-500 p-0.5 transition-all group-hover:border-primary-600 group-hover:shadow-lg">
                             <Avatar className="size-10">
                                 <AvatarImage src={photoURL ?? undefined} alt={displayName} />
@@ -228,4 +214,3 @@ const HeaderSection = ({
         </div>
     </motion.div>
 );
-

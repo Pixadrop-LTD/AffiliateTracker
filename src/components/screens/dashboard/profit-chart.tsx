@@ -103,7 +103,7 @@ export const ProfitChart = ({ data, currency = "USD", label = "", chartType = "l
                             {chartTypeButtons.map((type) => (
                                 <Button
                                     key={type}
-                                    variant={chartType === type ? "default" : "outline"}
+                                    variant={chartType === type ? "default" : "ghost"}
                                     size="sm"
                                     onClick={() => onChartTypeChange(type)}
                                     className="h-7 text-xs"
@@ -118,7 +118,7 @@ export const ProfitChart = ({ data, currency = "USD", label = "", chartType = "l
             <CardContent>
                 {hasData ? (
                     <ChartContainer config={chartConfig} className="h-[300px] w-full">
-                        {chartType === "line" && (
+                        {chartType === "line" ? (
                             <LineChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                                 <XAxis dataKey="dateLabel" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
@@ -138,8 +138,7 @@ export const ProfitChart = ({ data, currency = "USD", label = "", chartType = "l
                                     activeDot={{ r: 6 }}
                                 />
                             </LineChart>
-                        )}
-                        {chartType === "area" && (
+                        ) : chartType === "area" ? (
                             <AreaChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                                 <XAxis dataKey="dateLabel" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
@@ -158,8 +157,7 @@ export const ProfitChart = ({ data, currency = "USD", label = "", chartType = "l
                                 </defs>
                                 <Area type="monotone" dataKey="profit" stroke="var(--color-primary)" fill="url(#gradient)" strokeWidth={2} />
                             </AreaChart>
-                        )}
-                        {chartType === "bar" && (
+                        ) : (
                             <BarChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                                 <XAxis dataKey="dateLabel" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />

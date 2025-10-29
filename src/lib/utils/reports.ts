@@ -3,9 +3,9 @@
  * Helper functions for processing and formatting report data
  */
 
-import { format } from 'date-fns';
-import { effectiveRevenue } from '@/domain/models/entry';
 import type { EntryWithDerived } from '@/domain/models/entry';
+import { effectiveRevenue } from '@/domain/models/entry';
+import { format } from 'date-fns';
 
 export interface ChartData {
     x: string;
@@ -37,8 +37,17 @@ export const processChartData = (
     > = {};
 
     entries.forEach((entry) => {
-        const raw = entry.date?.toDate ? entry.date.toDate() : entry.date;
-        const date = new Date(raw);
+        let date: Date;
+        const entryDate = entry.date;
+
+        // Check if it has toDate method (Timestamp)
+        if (entryDate && typeof entryDate === 'object' && 'toDate' in entryDate && typeof (entryDate as any).toDate === 'function') {
+            date = (entryDate as any).toDate();
+        } else if (entryDate instanceof Date) {
+            date = entryDate;
+        } else {
+            date = new Date(entryDate as unknown as string | number);
+        }
         let key = '';
         let t = 0;
 
@@ -147,8 +156,18 @@ export const filterEntriesByDateRange = (
     endDate: Date
 ): EntryWithDerived[] => {
     return entries.filter((entry) => {
-        const entryDate = entry.date?.toDate ? entry.date.toDate() : entry.date;
-        const date = new Date(entryDate);
+        const entryDate = entry.date;
+
+        // Convert to Date if needed
+        let date: Date;
+        if (entryDate && typeof entryDate === 'object' && 'toDate' in entryDate && typeof (entryDate as any).toDate === 'function') {
+            date = (entryDate as any).toDate();
+        } else if (entryDate instanceof Date) {
+            date = entryDate;
+        } else {
+            date = new Date(entryDate as unknown as string | number);
+        }
+
         return date >= startDate && date <= endDate;
     });
 };
